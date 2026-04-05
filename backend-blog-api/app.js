@@ -2,11 +2,11 @@ const express = require("express");
 
 const app = express();
 
-app.get('/', (req, res) => {
-    res.json({
-        message: "asdasd"
-    })
-})
+const postRouter = require("./routes/postRouter");
+
+
+// app.use("/", postRouter);
+app.use("/posts", postRouter);
 
 const PORT = 3000;
 app.listen(PORT, (error) => {

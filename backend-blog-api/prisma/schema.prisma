@@ -15,7 +15,7 @@ datasource db {
 model User {
   id    Int    @id @default(autoincrement())
   email String @unique
-  // username String?
+  username String?
   password String
 
   posts Post[]
@@ -29,8 +29,8 @@ model Post {
   isPublished Boolean @default(false)
   publishedDate DateTime? 
 
-  user User @relation(fields: [userId], references: [id]) //do not delete posts if user is deleted. say deleted user as author instead?
-  userId Int
+  author User @relation(fields: [authorId], references: [id]) //do not delete posts if user is deleted. say deleted user as author instead?
+  authorId Int
 
   comments Comment[]
 }
@@ -40,8 +40,8 @@ model Comment {
   body String
   publishedDate DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id]) //don't delete comments if user is deleted
-  userId Int 
+  author User @relation(fields: [authorId], references: [id]) //don't delete comments if user is deleted
+  authorId Int 
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId Int
 }
