@@ -10,6 +10,9 @@ async function getAllPostsWithAuthors(req, res) {
                         email: true,
                         username: true
                     }
+                },
+                _count: {
+                    select: {comments: true} //https://www.prisma.io/docs/orm/prisma-client/queries/aggregation-grouping-summarizing
                 }
             }
         });
@@ -35,8 +38,21 @@ async function getPostWithAuthor(req, res) {
     }
 }
 
+async function getCommentsOfPost(req, res) {
+    try {
+        const commentsOfPost = await prisma.comment.findMany({
+           where: {postId: Number(req.params.postId)} 
+        });
+        res.json({comments: commentsOfPost});
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: "error fetching comments"})
+    }
+}
+
 
 module.exports = {
     getAllPostsWithAuthors,
-    getPostWithAuthor
+    getPostWithAuthor,
+    getCommentsOfPost
 }
