@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Comment" ADD COLUMN     "publishedDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
