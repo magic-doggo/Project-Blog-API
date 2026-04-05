@@ -7,4 +7,7 @@ postRouter.get("/", postController.getAllPostsWithAuthors);
 postRouter.get("/:postId", postController.getPostWithAuthor);
 postRouter.get("/:postId/comments", postController.getCommentsOfPost);
 
+postRouter.post("/", postController.createNewPost);
+postRouter.post("/:postId/comments", postController.createNewComment)
+
 module.exports = postRouter;
