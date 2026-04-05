@@ -83,10 +83,40 @@ async function createNewComment(req, res) {
     }
 }
 
+async function deletePost(req, res) {
+    try {
+        const deletedPost = await prisma.post.delete({
+            where: {
+                id: Number(req.params.postId)
+            }
+        });
+        res.json({deletedPost: deletedPost});
+    } catch (err){ 
+        console.error(err);
+        res.status(500).json({error: "error deleting post"})
+    }
+}
+
+async function deleteComment(req, res) {
+    try {
+        const deletedComment = await prisma.comment.delete({
+            where: {
+                id: Number(req.params.commentId),
+            }
+        });
+        res.json({deletedComment: deletedComment});
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: "error deleting comment"})
+    }
+}
+
 module.exports = {
     getAllPostsWithAuthors,
     getPostWithAuthor,
     getCommentsOfPost,
     createNewPost,
-    createNewComment
+    createNewComment,
+    deleteComment,
+    deletePost
 }
