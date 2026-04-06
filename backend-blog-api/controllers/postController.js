@@ -76,10 +76,45 @@ async function createNewComment(req, res) {
                 authorId: req.body.authorId //change this once jwt is implemented
             }
         });
-        res.json({comment: newComment})
+        res.json({ comment: newComment })
     } catch (err) {
         console.error(err);
-        res.status(500).json({error: "error creating comment"})
+        res.status(500).json({ error: "error creating comment" })
+    }
+}
+
+async function updatePost(req, res) {
+    try {
+        const updatedPost = await prisma.post.update({
+            where: {
+                id: Number(req.params.postId)
+            },
+            data: {
+                title: req.body.title,
+                body: req.body.postBody,
+            }
+        });
+        res.json(updatedPost);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "error updating post" })
+    }
+}
+
+async function updateComment(req, res) {
+    try {
+        const updatedComment = await prisma.comment.update({
+            where: {
+                id: Number(req.params.commentId),
+            },
+            data: {
+                body: req.body.commentBody,
+            }
+        });
+        res.json(updatedComment);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "error updating comment" })
     }
 }
 
@@ -90,10 +125,10 @@ async function deletePost(req, res) {
                 id: Number(req.params.postId)
             }
         });
-        res.json({deletedPost: deletedPost});
-    } catch (err){ 
+        res.json({ deletedPost: deletedPost });
+    } catch (err) {
         console.error(err);
-        res.status(500).json({error: "error deleting post"})
+        res.status(500).json({ error: "error deleting post" })
     }
 }
 
@@ -104,10 +139,10 @@ async function deleteComment(req, res) {
                 id: Number(req.params.commentId),
             }
         });
-        res.json({deletedComment: deletedComment});
+        res.json({ deletedComment: deletedComment });
     } catch (err) {
         console.error(err);
-        res.status(500).json({error: "error deleting comment"})
+        res.status(500).json({ error: "error deleting comment" })
     }
 }
 
@@ -117,6 +152,8 @@ module.exports = {
     getCommentsOfPost,
     createNewPost,
     createNewComment,
+    updatePost,
+    updateComment,
     deleteComment,
     deletePost
 }

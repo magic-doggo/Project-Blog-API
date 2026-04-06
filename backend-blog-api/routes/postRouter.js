@@ -10,7 +10,12 @@ postRouter.get("/:postId/comments", postController.getCommentsOfPost);
 postRouter.post("/", postController.createNewPost);
 postRouter.post("/:postId/comments", postController.createNewComment);
 
+postRouter.put("/:postId", postController.updatePost);
+postRouter.put("/:postId/comments/:commentId", postController.updateComment)
+
 postRouter.delete("/:postId", postController.deletePost);
-postRouter.delete("/:postId/comments/:commentId", postController.deleteComment)
+postRouter.delete("/:postId/comments/:commentId", postController.deleteComment) //do I even need to bother specifying postId? db knows correct commentId.
+
+
 
 module.exports = postRouter;

@@ -39,6 +39,7 @@ model Comment {
   id Int @id @default(autoincrement())
   body String
   publishedDate DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
 
   author User @relation(fields: [authorId], references: [id]) //don't delete comments if user is deleted
   authorId Int 
