@@ -101,6 +101,28 @@ async function updatePost(req, res) {
     }
 }
 
+async function updatePostStatus(req, res) {
+    const { isPublished } = req.body;
+    console.log(isPublished, " ispublished");
+    if (typeof isPublished !== 'boolean') return res.status(400).json({error: "isPublished must be true or false"});
+    try {
+        let updatedPostStatus = await prisma.post.update({
+            where: {
+                id: Number(req.params.postId),
+            },
+            data: {
+                isPublished: isPublished,
+                publishedDate: isPublished ? new Date() : null
+            }
+        });
+        console.log(updatedPostStatus, " updatedpoststatus")
+        res.json(updatedPostStatus);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: "error updating the post status (published/unpublished)"})
+    }
+}
+
 async function updateComment(req, res) {
     try {
         const updatedComment = await prisma.comment.update({
@@ -153,6 +175,7 @@ module.exports = {
     createNewPost,
     createNewComment,
     updatePost,
+    updatePostStatus,
     updateComment,
     deleteComment,
     deletePost
