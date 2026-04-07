@@ -30,8 +30,8 @@ model Post {
   isPublished Boolean @default(false)
   publishedDate DateTime? 
 
-  author User @relation(fields: [authorId], references: [id]) //do not delete posts if user is deleted. say deleted user as author instead?
-  authorId Int
+  author User? @relation(fields: [authorId], references: [id], onDelete: SetNull) //do not delete posts if user is deleted. set Author to null
+  authorId Int?
 
   comments Comment[]
 }
@@ -42,8 +42,8 @@ model Comment {
   publishedDate DateTime @default(now())
   updatedAt DateTime @updatedAt @default(now())
 
-  author User @relation(fields: [authorId], references: [id]) //don't delete comments if user is deleted
-  authorId Int 
+  author User? @relation(fields: [authorId], references: [id], onDelete: SetNull) //don't delete comments if user is deleted
+  authorId Int? 
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId Int
 }
