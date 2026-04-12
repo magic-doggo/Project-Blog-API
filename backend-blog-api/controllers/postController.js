@@ -1,4 +1,5 @@
 const { prisma } = require("../lib/prisma.js")
+const {isAuthorized} = require("../utils/permissions.js")
 
 async function getAllPostsWithAuthors(req, res) {
     try {
@@ -52,11 +53,13 @@ async function getCommentsOfPost(req, res) {
 
 async function createNewPost(req, res) {
     try {
+        const { title, postBody } = req.body;
+        const authorId = req.user.userId //from login/register jwt.sign({ userId: user.id }
         const newPost = await prisma.post.create({
             data: {
-                title: req.body.title,
-                body: req.body.postBody,
-                authorId: req.body.authorId //change this once JWT is implemented. currently sending authorId: 1 via postman
+                title: title,
+                body: postBody,
+                authorId: authorId
             }
         })
         console.log(newPost, "test");
@@ -69,11 +72,13 @@ async function createNewPost(req, res) {
 
 async function createNewComment(req, res) {
     try {
+        const { commentBody } = req.body;
+        const authorId = req.user.userId //from login/register jwt.sign({ userId: user.id }
         const newComment = await prisma.comment.create({
             data: {
                 postId: Number(req.params.postId),
-                body: req.body.commentBody,
-                authorId: req.body.authorId //change this once jwt is implemented
+                body: commentBody,
+                authorId: authorId
             }
         });
         res.json({ comment: newComment })
@@ -103,8 +108,7 @@ async function updatePost(req, res) {
 
 async function updatePostStatus(req, res) {
     const { isPublished } = req.body;
-    console.log(isPublished, " ispublished");
-    if (typeof isPublished !== 'boolean') return res.status(400).json({error: "isPublished must be true or false"});
+    if (typeof isPublished !== 'boolean') return res.status(400).json({ error: "isPublished must be true or false" });
     try {
         let updatedPostStatus = await prisma.post.update({
             where: {
@@ -119,11 +123,16 @@ async function updatePostStatus(req, res) {
         res.json(updatedPostStatus);
     } catch (err) {
         console.error(err);
-        res.status(500).json({error: "error updating the post status (published/unpublished)"})
+        res.status(500).json({ error: "error updating the post status (published/unpublished)" })
     }
 }
 
 async function updateComment(req, res) {
+    const commentId = Number(req.params.commentId);
+    const comment = await prisma.comment.findUnique({ where: { id: commentId } });
+    if (!comment) return res.status(404).json({ error: "comment not found" });
+    if (!isAuthorized(req.user, comment)) return res.status(403).json({ error: "You can only edit your own comments" });
+
     try {
         const updatedComment = await prisma.comment.update({
             where: {
@@ -155,10 +164,15 @@ async function deletePost(req, res) {
 }
 
 async function deleteComment(req, res) {
+    const commentId = Number(req.params.commentId);
+    const comment = await prisma.comment.findUnique({ where: { id: commentId } });
+    if (!comment) return res.status(404).json({ error: "comment not found" });
+    if (!isAuthorized(req.user, comment)) return res.status(403).json({ error: "You can only edit your own comments" });
+
     try {
         const deletedComment = await prisma.comment.delete({
             where: {
-                id: Number(req.params.commentId),
+                id: commentId,
             }
         });
         res.json({ deletedComment: deletedComment });
