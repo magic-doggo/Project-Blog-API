@@ -3,10 +3,22 @@ import { useState, useContext, createContext } from "react";
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext();
 
+function readStoredUser() {
+    const raw = localStorage.getItem("user");
+    if (raw == null || raw === "") {
+        return null
+    }
+    try {
+        return JSON.parse(raw);
+    } catch {
+        localStorage.removeItem("user"); //clear bad data
+        return null;
+    }
+}
+
 export function AuthProvider({ children }) {
     const [token, setToken] = useState(localStorage.getItem("token") || null);
-    const [user, setUser] = useState(JSON.parse(localStorage.getItem("user") || null));
-    console.log("THE PROVIDER IS RETAINING CLOUD DATA!")
+    const [user, setUser] = useState(() => readStoredUser()); //lazy state initialization. only runs once during initial render
     const login = (jwtToken, userData) => {
         setToken(jwtToken);
         setUser(userData);
@@ -30,7 +42,6 @@ export function AuthProvider({ children }) {
 
 // eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
-    // return useContext(AuthContext);
     const context = useContext(AuthContext);
     if (context === undefined) {
         throw new Error("useAuth must be used within AuthProvider")
