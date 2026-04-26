@@ -1,4 +1,5 @@
 import App from "./App";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 // import ErrorPage from "./pages/ErrorPage";
@@ -10,8 +11,13 @@ const routes = [
         //errorElement: <ErrorPage />,
         children: [
             {
-                path: "",
-                element: <Dashboard />
+                element: <ProtectedRoute />,
+                children: [
+                    {
+                        path: "",
+                        element: <Dashboard />
+                    },
+                ]
             },
             {
                 path: "login",
