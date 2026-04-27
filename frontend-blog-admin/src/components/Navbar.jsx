@@ -14,6 +14,7 @@ export default function Navbar() {
                     (
                         <>
                             <li><span className="welcome-text">Hi, {user.username}</span></li>
+                            <li><NavLink to="/newPost" className={({ isActive }) => (isActive ? styles.active : "")}>Create new Post +</NavLink></li>
                             <li><button onClick={logout} className="logout-btn">Logout</button></li>
                         </>
 
