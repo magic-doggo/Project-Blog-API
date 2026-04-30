@@ -6,6 +6,8 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export default function Dashboard() {
   const { token } = useAuth();
   const [posts, setPosts] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
+
 
   useEffect(() => {
     let cancelled = false;
@@ -36,6 +38,33 @@ export default function Dashboard() {
     };
   }, [token])
 
+  async function deletePost(id) {
+    if (!token) return;
+    setErrorMessage("");
+    try {
+      const response = await fetch(`${API_BASE_URL}/posts/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        let errorMessage = "Failed to Delete Post";
+        try {
+          const data = await response.json();
+          errorMessage = data.error ?? errorMessage;
+        } catch {
+          console.error("Could not read error message")
+        }
+        setErrorMessage(errorMessage);
+        return;
+      }
+      setPosts((prev) => prev.filter((post) => post.id !== id));
+    } catch (err) {
+      console.error(err);
+      setErrorMessage("Could not reach the server")
+    }
+  }
+
   return (
     <div>
       <h1>Admin Dashboard</h1>
@@ -43,16 +72,20 @@ export default function Dashboard() {
       {posts.length === 0 ? (
         <p>No posts yet</p>
       ) : (
-        <ul>
-          {posts.map((post) => (
-            <li key={post.id}>
-              <div>Title: {post.title} - Author: {post.author?.username ?? "deleted user"} - nrofcomments: {post._count.comments}</div>
-              <div>{post.isPublished ? "Published" : "Drat (not published)"} </div>
-              <button>{post.isPublished ? "UNPUBLISH POST" : "Publish post"}</button>
-              <button>Edit post</button>
-            </li>
-          ))}
-        </ul>
+        <div>
+          {errorMessage && <p role="alert">{errorMessage}</p>}
+          <ul>
+            {posts.map((post) => (
+              <li key={post.id}>
+                <div>Title: {post.title} - Author: {post.author?.username ?? "deleted user"} - nrofcomments: {post._count.comments}</div>
+                <div>{post.isPublished ? "Published" : "Draft (not published)"} </div>
+                <button>{post.isPublished ? "UNPUBLISH POST" : "Publish post"}</button>
+                <button>Edit post</button>
+                <button type="button" onClick={() => deletePost(post.id)}>Delete post</button>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );
