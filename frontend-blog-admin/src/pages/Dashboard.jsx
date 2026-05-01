@@ -64,6 +64,51 @@ export default function Dashboard() {
       setErrorMessage("Could not reach the server")
     }
   }
+  async function togglePostPublishStatus(id, currentlyPublished) {
+    if (!token) return;
+    setErrorMessage("");
+    let valueToChangePublishedTo = !currentlyPublished;
+    try {
+      const response = await fetch(`${API_BASE_URL}/posts/${id}/status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ isPublished: valueToChangePublishedTo }),
+      });
+
+      if (!response.ok) {
+        let errorMessage = "Failed to update post publish status";
+        try {
+          const data = await response.json();
+          errorMessage = data.error ?? errorMessage;
+        } catch {
+          console.error("Could not read error message")
+        }
+        setErrorMessage(errorMessage);
+        return;
+      }
+
+      const updatedData = await response.json();
+      setPosts((prev) => {
+        const updatedPosts = [];
+        for (const post of prev) {
+          if (post.id === id) {
+            updatedPosts.push({
+              ...post,
+              isPublished: updatedData.isPublished,
+              publishedDate: updatedData.publishedDate,
+            });
+          } else updatedPosts.push(post);
+        }
+        return updatedPosts;
+      });
+      //or this instead: setPosts((prev) =>prev.map((post) => post.id === id ? { ...post, ...updatedData } : post));
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   return (
     <div>
@@ -79,7 +124,7 @@ export default function Dashboard() {
               <li key={post.id}>
                 <div>Title: {post.title} - Author: {post.author?.username ?? "deleted user"} - nrofcomments: {post._count.comments}</div>
                 <div>{post.isPublished ? "Published" : "Draft (not published)"} </div>
-                <button>{post.isPublished ? "UNPUBLISH POST" : "Publish post"}</button>
+                <button type="button" onClick={() => togglePostPublishStatus(post.id, post.isPublished)}>{post.isPublished ? "Unpublish post" : "Publish post"}</button>
                 <button>Edit post</button>
                 <button type="button" onClick={() => deletePost(post.id)}>Delete post</button>
               </li>
