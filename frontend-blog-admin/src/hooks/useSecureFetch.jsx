@@ -1,8 +1,9 @@
+import { useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 
 export function useSecureFetch() {
     const { token, logout } = useAuth();
-    const secureFetch = async (url, options = {}) => {
+    const secureFetch = useCallback(async (url, options = {}) => {
         const headers = { ...options.headers };
 
         //will probably noy need this if I do not upload images using forms
@@ -22,6 +23,6 @@ export function useSecureFetch() {
             throw new Error("Session expired");
         }
         return response;
-    }
+    }, [token, logout])
     return secureFetch;
 }

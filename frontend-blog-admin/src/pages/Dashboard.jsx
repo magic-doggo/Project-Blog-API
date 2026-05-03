@@ -35,10 +35,9 @@ export default function Dashboard() {
     }
     loadPosts();
     return () => {
-      console.log('asdasdad')
       cancelled = true;  // stops before setPosts if page about to be changed or component loads again
     };
-  }, [token])
+  }, [secureFetch])
 
   async function deletePost(id) {
     if (!token) return;
