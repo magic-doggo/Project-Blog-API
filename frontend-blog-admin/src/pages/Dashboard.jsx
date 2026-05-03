@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useSecureFetch } from "../hooks/useSecureFetch";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Dashboard() {
+  const secureFetch = useSecureFetch(); //logs out user if they use expired token for api calls
   const { token } = useAuth();
   const [posts, setPosts] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
@@ -13,11 +15,11 @@ export default function Dashboard() {
     let cancelled = false;
     async function loadPosts() {
       try {
-        const response = await fetch(`${API_BASE_URL}/posts`, {
+        const response = await secureFetch(`${API_BASE_URL}/posts`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
+            // Authorization: `Bearer ${token}` //secureFetch should include this
           }
         });
         if (!response.ok) {
@@ -42,9 +44,9 @@ export default function Dashboard() {
     if (!token) return;
     setErrorMessage("");
     try {
-      const response = await fetch(`${API_BASE_URL}/posts/${id}`, {
+      const response = await secureFetch(`${API_BASE_URL}/posts/${id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        // headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.ok) {
@@ -53,7 +55,8 @@ export default function Dashboard() {
           const data = await response.json();
           errorMessage = data.error ?? errorMessage;
         } catch {
-          console.error("Could not read error message")
+          console.error("Could not read error message");
+          console.log(response);
         }
         setErrorMessage(errorMessage);
         return;
@@ -69,11 +72,11 @@ export default function Dashboard() {
     setErrorMessage("");
     let valueToChangePublishedTo = !currentlyPublished;
     try {
-      const response = await fetch(`${API_BASE_URL}/posts/${id}/status`, {
+      const response = await secureFetch(`${API_BASE_URL}/posts/${id}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          // Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({ isPublished: valueToChangePublishedTo }),
       });

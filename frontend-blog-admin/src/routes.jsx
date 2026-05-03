@@ -19,7 +19,7 @@ const routes = [
                         element: <Dashboard />
                     },
                     {
-                        path: "/newPost",
+                        path: "newPost",
                         element: <NewPost/>
                     }
                 ]
