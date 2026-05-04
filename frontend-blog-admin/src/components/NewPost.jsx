@@ -33,7 +33,7 @@ export default function NewPost() {
         }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/posts`, {
+            const response = await fetch(`${API_BASE_URL}/admin/posts`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

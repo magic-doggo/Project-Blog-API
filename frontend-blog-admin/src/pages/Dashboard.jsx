@@ -15,7 +15,7 @@ export default function Dashboard() {
     let cancelled = false;
     async function loadPosts() {
       try {
-        const response = await secureFetch(`${API_BASE_URL}/posts`, {
+        const response = await secureFetch(`${API_BASE_URL}/admin/posts`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -43,7 +43,7 @@ export default function Dashboard() {
     if (!token) return;
     setErrorMessage("");
     try {
-      const response = await secureFetch(`${API_BASE_URL}/posts/${id}`, {
+      const response = await secureFetch(`${API_BASE_URL}/admin/posts/${id}`, {
         method: "DELETE",
         // headers: { Authorization: `Bearer ${token}` },
       });
@@ -71,7 +71,7 @@ export default function Dashboard() {
     setErrorMessage("");
     let valueToChangePublishedTo = !currentlyPublished;
     try {
-      const response = await secureFetch(`${API_BASE_URL}/posts/${id}/status`, {
+      const response = await secureFetch(`${API_BASE_URL}/admin/posts/${id}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
