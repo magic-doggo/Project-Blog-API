@@ -4,12 +4,14 @@ var cors = require('cors')
 app.use(cors());
 
 app.use(express.json());
-const postRouter = require("./routes/postRouter");
+const adminPostRouter = require("./routes/adminPostRouter");
+// const publicPostRouter = require("./routes/publicPostRouter");
 const authRouter = require("./routes/authRouter");
 const userRouter = require("./routes/userRouter");
 
 
-app.use("/posts", postRouter);
+// app.use("/posts", publicPostRouter);
+app.use("/admin/posts", adminPostRouter);
 app.use("/auth", authRouter);
 app.use("/users", userRouter)
 const PORT = 3000;
