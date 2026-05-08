@@ -1,4 +1,4 @@
-import { useState, useContext, createContext } from "react";
+import { useState, useContext, createContext, useEffect } from "react";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext();
@@ -25,6 +25,16 @@ export function AuthProvider({ children }) {
         localStorage.setItem("token", jwtToken);
         localStorage.setItem("user", JSON.stringify(userData))
     }
+    useEffect(() => {
+        function onStorage(e) {
+            if (e.key === "token" && e.newValue === null) {
+                setToken(null);
+                setUser(null);
+            }
+        }
+        window.addEventListener("storage", onStorage);
+        return () => window.removeEventListener("storage", onStorage);
+    }, []);
 
     const logout = () => {
         setToken(null);

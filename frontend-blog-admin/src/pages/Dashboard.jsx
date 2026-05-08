@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useSecureFetch } from "../hooks/useSecureFetch";
+import { Link } from "react-router-dom";
+
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -124,10 +126,11 @@ export default function Dashboard() {
           <ul>
             {posts.map((post) => (
               <li key={post.id}>
-                <div>Title: {post.title} - Author: {post.author?.username ?? "deleted user"} - nrofcomments: {post._count.comments}</div>
+                <Link to={`/admin/posts/${post.id}`}>
+                  <div>Title: {post.title} - Author: {post.author?.username ?? "deleted user"} - nrofcomments: {post._count.comments}</div>
+                </Link>
                 <div>{post.isPublished ? "Published" : "Draft (not published)"} </div>
                 <button type="button" onClick={() => togglePostPublishStatus(post.id, post.isPublished)}>{post.isPublished ? "Unpublish post" : "Publish post"}</button>
-                <button>Edit post</button>
                 <button type="button" onClick={() => deletePost(post.id)}>Delete post</button>
               </li>
             ))}

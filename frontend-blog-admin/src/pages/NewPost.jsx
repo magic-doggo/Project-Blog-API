@@ -56,7 +56,7 @@ export default function NewPost() {
                 setErrorMessage(data?.error ?? `failed to create post (${response.status})`);
                 return;
             }
-            navigate("/")// will edit to go to /data.post.id once I create a page for individual posts
+            navigate(`/admin/posts/${data.post.id}`)// will edit to go to /data.post.id once I create a page for individual posts
 
         } catch (err) {
             console.error(err);

@@ -7,7 +7,7 @@ export default function ProtectedRoute() {
 
   if (!token) {
     console.log("no token, redirect to login");
-    return <Navigate to="/login" state={{ from: location }} replace />; //after login, redirect to page the user was trying to access when being redirected to login
+    return <Navigate to="/admin/login" state={{ from: location }} replace />; //after login, redirect to page the user was trying to access when being redirected to login
   }
   return <Outlet />;
 }

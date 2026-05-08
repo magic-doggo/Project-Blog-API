@@ -2,12 +2,13 @@ import App from "./App";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
-import NewPost from "./components/NewPost"
+import NewPost from "./pages/NewPost"
+import PostDetails from "./pages/PostDetails";
 // import ErrorPage from "./pages/ErrorPage";
 
 const routes = [
     {
-        path: "/",
+        path: "/admin",
         element: <App />,
         //errorElement: <ErrorPage />,
         children: [
@@ -21,6 +22,10 @@ const routes = [
                     {
                         path: "newPost",
                         element: <NewPost/>
+                    },
+                    {
+                        path: "posts/:postId",
+                        element: <PostDetails />
                     }
                 ]
             },

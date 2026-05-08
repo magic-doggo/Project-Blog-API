@@ -9,18 +9,19 @@ export default function Navbar() {
         <nav className="navbar">
             <h2>Blog admin</h2>
             <ul>
-                <li><NavLink to="/" className={({ isActive }) => isActive ? styles.active : ""} >Dashboard</NavLink></li>
+                {/* at some point when regular user page is ready, only show login page for not logged in users on admin page, as well as a link to regular user/public page*/}
+                <li><NavLink to="/admin" className={({ isActive }) => isActive ? styles.active : ""} >Dashboard</NavLink></li> 
                 {user ?
                     (
                         <>
                             <li><span className="welcome-text">Hi, {user.username}</span></li>
-                            <li><NavLink to="/newPost" className={({ isActive }) => (isActive ? styles.active : "")}>Create new Post +</NavLink></li>
+                            <li><NavLink to="/admin/newPost" className={({ isActive }) => (isActive ? styles.active : "")}>Create new Post +</NavLink></li>
                             <li><button onClick={logout} className="logout-btn">Logout</button></li>
                         </>
 
                     ) : (
                         <li>
-                            <NavLink to="/login" className={({ isActive }) => (isActive ? styles.active : "")}>Login</NavLink>
+                            <NavLink to="/admin/login" className={({ isActive }) => (isActive ? styles.active : "")}>Login</NavLink>
                         </li>
                     )
                 }

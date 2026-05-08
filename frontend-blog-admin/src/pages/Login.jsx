@@ -11,7 +11,7 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-    const fromPath = location.state?.from?.pathname || "/";
+    const fromPath = location.state?.from?.pathname || "/admin";
     // useEffect(() => {
     //     console.log("location.state:", location.state);
     // }, [location]);
