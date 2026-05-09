@@ -1,5 +1,7 @@
-const { prisma } = require("../lib/prisma.js")
-const {isAuthorized} = require("../utils/permissions.js")
+const { prisma } = require("../lib/prisma.js");
+const { isAuthorized } = require("../utils/permissions.js");
+const { sanitizePostBody } = require("../utils/sanitizePostBody.js");
+
 
 async function getAllPostsWithAuthors(req, res) {
     try {
@@ -30,7 +32,19 @@ async function getAllPostsWithAuthors(req, res) {
 async function getPostWithAuthor(req, res) {
     try {
         const postWithAuthor = await prisma.post.findUnique({
-            where: { id: Number(req.params.postId) }
+            where: { id: Number(req.params.postId) },
+            include: {
+                author: {
+                    select: {
+                        id: true,
+                        email: true,
+                        username: true
+                    }
+                },
+                _count: {
+                    select: { comments: true } //maybe move this to getcomments?
+                }
+            }
         })
         res.json({ post: postWithAuthor });
     } catch (err) {
@@ -58,7 +72,7 @@ async function createNewPost(req, res) {
         const newPost = await prisma.post.create({
             data: {
                 title: title,
-                body: postBody,
+                body: sanitizePostBody(postBody),
                 authorId: authorId
             }
         })

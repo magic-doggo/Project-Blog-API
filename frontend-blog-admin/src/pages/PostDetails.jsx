@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSecureFetch } from "../hooks/useSecureFetch";
+import DOMPurify from 'dompurify';
+
 
 
 
@@ -35,6 +37,7 @@ export default function PostDetails() {
                     throw new Error("Failed to fetch post");
                 };
                 const data = await response.json();
+                console.log(data.post);
                 if (cancelled) return;
                 setPost(data.post ?? null);
                 console.log("data: ", data)
@@ -81,7 +84,7 @@ export default function PostDetails() {
 
             const updatedData = await response.json();
             // setPost({ ...post, isPublished: updatedData.isPublished, publishedDate: updatedData.publishedDate })
-            setPost((prev) => ({...prev, isPublished: updatedData.isPublished, publishedDate: updatedData.publishedDate}))
+            setPost((prev) => ({ ...prev, isPublished: updatedData.isPublished, publishedDate: updatedData.publishedDate }))
         } catch (err) {
             console.error(err);
         }
@@ -122,7 +125,12 @@ export default function PostDetails() {
             {errorMessage && <p role="alert">{errorMessage}</p>}
             <h3>Title: {post.title}</h3>
             <p>Post Body:</p>
-            <div>{post.body}</div>
+            <div
+                className="post-body"
+                dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(post.body ?? ""),
+                }}
+            />
             <p>Author: {post.author?.username ?? "deleted user"}</p>
             <p>{post.isPublished ? "Published" : "Draft (not published)"} </p>
             <button type="button" onClick={() => togglePostPublishStatus(post.id, post.isPublished)}>{post.isPublished ? "Unpublish post" : "Publish post"}</button>
