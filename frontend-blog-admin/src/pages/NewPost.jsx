@@ -2,12 +2,14 @@ import { useState, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Editor } from '@tinymce/tinymce-react';
-
+import { useSecureFetch } from "../hooks/useSecureFetch";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function NewPost() {
     const editorRef = useRef(null);
+    const secureFetch = useSecureFetch();
+
     // const log = () => {
     //     if (editorRef.current) {
     //         console.log(editorRef.current.getContent());
@@ -33,7 +35,7 @@ export default function NewPost() {
         }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/admin/posts`, {
+            const response = await secureFetch(`${API_BASE_URL}/admin/posts`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
