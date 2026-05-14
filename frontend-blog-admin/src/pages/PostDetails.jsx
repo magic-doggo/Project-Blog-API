@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { useSecureFetch } from "../hooks/useSecureFetch";
 import DOMPurify from 'dompurify';
+import EditPost from "./EditPost";
 
 
 
@@ -118,6 +119,12 @@ export default function PostDetails() {
         }
     }
 
+    // async function editPost(targetId) {
+    //     if (!token) return;
+    //     navigate(`/admin/posts/${targetId}/edit`);
+
+    // }
+
 
     return (
         <div>
@@ -134,6 +141,7 @@ export default function PostDetails() {
             <p>Author: {post.author?.username ?? "deleted user"}</p>
             <p>{post.isPublished ? "Published" : "Draft (not published)"} </p>
             <button type="button" onClick={() => togglePostPublishStatus(post.id, post.isPublished)}>{post.isPublished ? "Unpublish post" : "Publish post"}</button>
+            <Link to={`/admin/posts/${post.id}/edit`}>Edit post</Link>
             <button type="button" onClick={() => deletePost(post.id)}>Delete post</button>
 
 

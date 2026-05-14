@@ -4,6 +4,7 @@ import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import NewPost from "./pages/NewPost"
 import PostDetails from "./pages/PostDetails";
+import EditPost from "./pages/EditPost"
 // import ErrorPage from "./pages/ErrorPage";
 
 const routes = [
@@ -25,7 +26,11 @@ const routes = [
                     },
                     {
                         path: "posts/:postId",
-                        element: <PostDetails />
+                        element: <PostDetails />,
+                    },
+                    {
+                        path: "posts/:postId/edit",
+                        element: <EditPost />
                     }
                 ]
             },
