@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 
 export default function App() {
   return (
-    <div className="admin-layout">
+    <div className="reader-layout">
       {/* <Navbar/> */}
 
       <main>
