@@ -26,6 +26,34 @@ async function getAllPostsWithAuthors(req, res) {
         console.error(err);
         res.status(500).json({ error: "error fetching posts" })
     }
+}
+
+async function getAllPublishedPostsWithAuthors(req, res) {
+    try {
+        const publishedPostsWithAuthors = await prisma.post.findMany({
+            where: {
+                isPublished: true,
+            },
+            include: {
+                author: {
+                    select: {
+                        id: true,
+                        // email: true, //do I actually need to show this?
+                        username: true
+                    }
+                },
+                _count: {
+                    select: { comments: true } //https://www.prisma.io/docs/orm/prisma-client/queries/aggregation-grouping-summarizing
+                }
+            }
+        });
+        res.json({
+            posts: publishedPostsWithAuthors
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "error fetching posts" })
+    }
 
 }
 
@@ -198,6 +226,7 @@ async function deleteComment(req, res) {
 
 module.exports = {
     getAllPostsWithAuthors,
+    getAllPublishedPostsWithAuthors,
     getPostWithAuthor,
     getCommentsOfPost,
     createNewPost,
