@@ -81,12 +81,54 @@ async function getPostWithAuthor(req, res) {
     }
 }
 
+async function getPublishedPostWithAuthor(req, res) {
+    try {
+        const publishedPostWithAuthor = await prisma.post.findUnique({
+            where: {
+                id: Number(req.params.postId),
+                isPublished: true,
+            },
+            include: {
+                author: {
+                    select: {
+                        id: true,
+                        // email: true,
+                        username: true
+                    }
+                },
+                _count: {
+                    select: { comments: true } //maybe move this to getcomments?
+                }
+            }
+        })
+        res.json({ post: publishedPostWithAuthor });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "error fetching post" })
+    }
+}
+
 async function getCommentsOfPost(req, res) {
     try {
         const commentsOfPost = await prisma.comment.findMany({
             where: { postId: Number(req.params.postId) }
         });
         res.json({ comments: commentsOfPost });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "error fetching comments" })
+    }
+}
+
+async function getCommentsOfPublishedPost(req, res) {
+    try {
+        const commentsOfPublishedPost = await prisma.comment.findMany({
+            where: {
+                postId: Number(req.params.postId),
+                post: { isPublished: true },
+            },
+        });
+        res.json({ comments: commentsOfPublishedPost });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "error fetching comments" })
@@ -114,7 +156,7 @@ async function createNewPost(req, res) {
 
 async function createNewComment(req, res) {
     try {
-        const { commentBody } = req.body;
+        const { commentBody } = req.body; //destructuring const commentBody = req.body.commentBody;
         const authorId = req.user.userId //from login/register jwt.sign({ userId: user.id }
         const newComment = await prisma.comment.create({
             data: {
@@ -124,6 +166,35 @@ async function createNewComment(req, res) {
             }
         });
         res.json({ comment: newComment })
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "error creating comment" })
+    }
+}
+
+async function createNewCommentOnPublishedPost(req, res) {
+    try {
+        const { commentBody } = req.body;
+        const authorId = req.user.userId //from login/register jwt.sign({ userId: user.id }
+        const postId = Number(req.params.postId);
+
+        const post = await prisma.post.findUnique({
+            where: { id: postId, isPublished: true },
+            select: {id: true},
+        });
+
+        if (!post) {
+            return res.status(404).json({error: "Post not found"})
+        }
+
+        const newCommentOnPublishedPost = await prisma.comment.create({
+            data: {
+                postId: postId,
+                body: commentBody,
+                authorId: authorId
+            }
+        });
+        res.json({ comment: newCommentOnPublishedPost })
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "error creating comment" })
@@ -228,9 +299,12 @@ module.exports = {
     getAllPostsWithAuthors,
     getAllPublishedPostsWithAuthors,
     getPostWithAuthor,
+    getPublishedPostWithAuthor,
     getCommentsOfPost,
+    getCommentsOfPublishedPost,
     createNewPost,
     createNewComment,
+    createNewCommentOnPublishedPost,
     updatePost,
     updatePostStatus,
     updateComment,
