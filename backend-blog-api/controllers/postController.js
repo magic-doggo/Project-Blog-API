@@ -111,7 +111,12 @@ async function getPublishedPostWithAuthor(req, res) {
 async function getCommentsOfPost(req, res) {
     try {
         const commentsOfPost = await prisma.comment.findMany({
-            where: { postId: Number(req.params.postId) }
+            where: { postId: Number(req.params.postId) },
+            include: {
+                author: {
+                    select: { username: true }
+                }
+            }
         });
         res.json({ comments: commentsOfPost });
     } catch (err) {
@@ -127,6 +132,11 @@ async function getCommentsOfPublishedPost(req, res) {
                 postId: Number(req.params.postId),
                 post: { isPublished: true },
             },
+            include: {
+                author: {
+                    select: { username: true }
+                }
+            }
         });
         res.json({ comments: commentsOfPublishedPost });
     } catch (err) {
@@ -329,7 +339,7 @@ async function deleteCommentOnPublishedPost(req, res) {
             where: {
                 id: commentId,
                 post: { isPublished: true },
-                postId: postId 
+                postId: postId
             },
         });
         if (!comment) return res.status(404).json({ error: "comment not found" });

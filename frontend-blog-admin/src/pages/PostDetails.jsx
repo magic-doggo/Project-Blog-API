@@ -18,7 +18,7 @@ export default function PostDetails() {
     const idIsValid = Number.isFinite(id) && id > 0;
 
     const [post, setPost] = useState(null);
-    // const [comments, setComments] = useState([]);
+    const [comments, setComments] = useState([]);
     const [errorMessage, setErrorMessage] = useState("");
 
     const secureFetch = useSecureFetch();
@@ -47,6 +47,29 @@ export default function PostDetails() {
             }
         }
         loadPost();
+
+        async function loadComments() {
+            try {
+                const response = await secureFetch(`${API_BASE_URL}/admin/posts/${id}/comments`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error("Failed to fetch comments");
+                };
+                const data = await response.json();
+                console.log("data.comments: ", data.comments);
+                if (cancelled) return;
+                setComments(data.comments ?? null);
+                console.log("data: ", data)
+            } catch (err) {
+                console.error(err);
+            }
+        }
+        loadComments();
+
         return () => {
             cancelled = true;  // stops before setPost if page about to be changed or component loads again
         };
@@ -119,12 +142,6 @@ export default function PostDetails() {
         }
     }
 
-    // async function editPost(targetId) {
-    //     if (!token) return;
-    //     navigate(`/admin/posts/${targetId}/edit`);
-
-    // }
-
 
     return (
         <div>
@@ -145,16 +162,16 @@ export default function PostDetails() {
             <button type="button" onClick={() => deletePost(post.id)}>Delete post</button>
 
 
-            {/* <p>NrOfCommentsIconPlaceholder: {post._count.comments}</p> */}
-            {/* <p>Comments:</p>
+            <p>NrOfCommentsIconPlaceholder: {post._count.comments}</p>
+            <p>Comments:</p>
             <ul>
-                {comments.map((comment) => {
+                {comments.map((comment) => (
                     <li key={comment.id}>
                         <div>{comment.body}</div>
-                        <div>{comment.author} - {comment.updatedAt ?? comment.publishedDate}</div>
+                        <div>{comment.author.username} - {comment.updatedAt ?? comment.publishedDate}</div>
                     </li>
-                })}
-            </ul> */}
+                ))}
+            </ul>
         </div>
     )
 }
