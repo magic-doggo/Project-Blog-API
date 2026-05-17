@@ -1,7 +1,8 @@
 const { prisma } = require("../lib/prisma.js");
+const { post } = require("../routes/publicPostRouter.js");
 const { isAuthorized } = require("../utils/permissions.js");
 const { sanitizePostBody } = require("../utils/sanitizePostBody.js");
-
+//go back and update all res.json to return objects e.g.             posts: postsWithAuthors
 
 async function getAllPostsWithAuthors(req, res) {
     try {
@@ -180,11 +181,11 @@ async function createNewCommentOnPublishedPost(req, res) {
 
         const post = await prisma.post.findUnique({
             where: { id: postId, isPublished: true },
-            select: {id: true},
+            select: { id: true },
         });
 
         if (!post) {
-            return res.status(404).json({error: "Post not found"})
+            return res.status(404).json({ error: "Post not found" })
         }
 
         const newCommentOnPublishedPost = await prisma.comment.create({
@@ -242,20 +243,46 @@ async function updatePostStatus(req, res) {
 
 async function updateComment(req, res) {
     const commentId = Number(req.params.commentId);
-    const comment = await prisma.comment.findUnique({ where: { id: commentId } });
-    if (!comment) return res.status(404).json({ error: "comment not found" });
-    if (!isAuthorized(req.user, comment)) return res.status(403).json({ error: "You can only edit your own comments" });
-
     try {
+        const comment = await prisma.comment.findUnique({ where: { id: commentId } });
+        if (!comment) return res.status(404).json({ error: "comment not found" });
+        if (!isAuthorized(req.user, comment)) return res.status(403).json({ error: "You can only edit your own comments" });
         const updatedComment = await prisma.comment.update({
             where: {
-                id: Number(req.params.commentId),
+                id: commentId,
             },
             data: {
                 body: req.body.commentBody,
             }
         });
-        res.json(updatedComment);
+        res.json({ comment: updatedComment });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "error updating comment" })
+    }
+}
+
+async function updateCommentOnPublishedPost(req, res) {
+    const commentId = Number(req.params.commentId);
+    const postId = Number(req.params.postId);
+    try {
+        const comment = await prisma.comment.findFirst({
+            where: {
+                id: commentId, postId: postId,
+                post: { isPublished: true },
+            }
+        });
+        if (!comment) return res.status(404).json({ error: "comment not found" });
+        if (!isAuthorized(req.user, comment)) return res.status(403).json({ error: "You can only edit your own comments" });
+        const updatedCommentOnPublishedPost = await prisma.comment.update({
+            where: {
+                id: commentId,
+            },
+            data: {
+                body: req.body.commentBody,
+            }
+        });
+        res.json({ comment: updatedCommentOnPublishedPost });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "error updating comment" })
@@ -295,6 +322,32 @@ async function deleteComment(req, res) {
     }
 }
 
+async function deleteCommentOnPublishedPost(req, res) {
+    const commentId = Number(req.params.commentId);
+    const postId = Number(req.params.postId);
+    try {
+        const comment = await prisma.comment.findFirst({
+            where: {
+                id: commentId,
+                post: { isPublished: true },
+                postId: postId 
+            },
+        });
+        if (!comment) return res.status(404).json({ error: "comment not found" });
+        if (!isAuthorized(req.user, comment)) return res.status(403).json({ error: "You can only delete your own comments" });
+
+        const deletedComment = await prisma.comment.delete({
+            where: {
+                id: commentId,
+            }
+        });
+        res.json({ deletedComment: deletedComment });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "error deleting comment" })
+    }
+}
+
 module.exports = {
     getAllPostsWithAuthors,
     getAllPublishedPostsWithAuthors,
@@ -308,6 +361,8 @@ module.exports = {
     updatePost,
     updatePostStatus,
     updateComment,
+    updateCommentOnPublishedPost,
     deleteComment,
+    deleteCommentOnPublishedPost,
     deletePost
 }
