@@ -1,8 +1,7 @@
 const { prisma } = require("../lib/prisma.js");
-const { post } = require("../routes/publicPostRouter.js");
 const { isAuthorized } = require("../utils/permissions.js");
 const { sanitizePostBody } = require("../utils/sanitizePostBody.js");
-//go back and update all res.json to return objects e.g.             posts: postsWithAuthors
+//go back and update all res.json to return objects e.g. posts: postsWithAuthors
 
 async function getAllPostsWithAuthors(req, res) {
     try {
