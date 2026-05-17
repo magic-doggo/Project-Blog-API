@@ -2,6 +2,7 @@ import App from "./App";
 // import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
 import PostDetails from "./pages/PostDetails";
+import Login from "./pages/Login";
 // import ErrorPage from "./pages/ErrorPage";
 
 const routes = [
@@ -18,6 +19,10 @@ const routes = [
                 path: "posts/:postId",
                 element: <PostDetails />,
             },
+            {
+                path: "login",
+                element: <Login />
+            }
             // {
             //     element: <ProtectedRoute />,
             //     children: [
