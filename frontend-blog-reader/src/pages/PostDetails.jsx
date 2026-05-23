@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-// import { useAuth } from "../context/AuthContext";
-import { useParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { useSecureFetch } from "../hooks/useSecureFetch";
 import DOMPurify from 'dompurify';
 
@@ -8,10 +8,12 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function PostDetails() {
     // const navigate = useNavigate();
-    // const { token } = useAuth();
+    const { token } = useAuth();
     const { postId } = useParams();
     const id = Number(postId);
     const idIsValid = Number.isFinite(id) && id > 0;
+    const location = useLocation();
+
 
     const [post, setPost] = useState(null);
     const [comments, setComments] = useState([]);
@@ -134,29 +136,34 @@ export default function PostDetails() {
             <p>Leave a comment for <strong>"{post.title}"</strong>:</p>
             {errorMessage && <p role="alert">{errorMessage}</p>}
 
-            <form onSubmit={handleSubmit}>
-                <label htmlFor="commentBody">Comment: </label>
-                <input
-                    id="commentBody"
-                    type="text"
-                    name="commentBody"
-                    value={commentBody}
-                    onChange={(e) => {
-                        setCommentBody(e.target.value); setErrorMessage("");
-                    }} required
-                />
-                <button type="submit">Submit comment</button>
-            </form>
+            {token ?
+                (<div>
+                    <form onSubmit={handleSubmit}>
+                        <label htmlFor="commentBody">Comment: </label>
+                        <input
+                            id="commentBody"
+                            type="text"
+                            name="commentBody"
+                            value={commentBody}
+                            onChange={(e) => {
+                                setCommentBody(e.target.value); setErrorMessage("");
+                            }} required
+                        />
+                        <button type="submit">Submit comment</button>
+                    </form>
+                </div>) :
+                (<div>To leave a comment, please <Link to="/login" state={{ from: location }}>log in</Link>.</div>)}
             <p>Nr of comments: {comments.length}</p>
             <p>Comments:</p>
             <ul>
                 {comments.map((comment) => (
                     <li key={comment.id}>
                         <div>{comment.body}</div>
-                        <div>{comment.author.username} - {comment.updatedAt ?? comment.publishedDate}</div>
+                        <div>{comment.author?.username ?? "deleted user"} - {comment.updatedAt ?? comment.publishedDate}</div>
                     </li>
                 ))}
             </ul>
+
         </div>
     )
 }
