@@ -79,6 +79,7 @@ export default function PostDetails() {
         return <div>Please input a valid id</div>;
     }
     if (!post) return <p>Loading…</p>;
+    if (!comments) return <p>Loading…</p>;
 
 
     async function togglePostPublishStatus(targetId, currentlyPublished) {
@@ -142,6 +143,31 @@ export default function PostDetails() {
         }
     }
 
+    async function deleteComment(postId, commentId) {
+        if (!token) return;
+        setErrorMessage("");
+        try {
+            const response = await secureFetch(`${API_BASE_URL}/admin/posts/${postId}/comments/${commentId}`, {
+                method: "DELETE",
+            });
+            if (!response.ok) {
+                let errorMessage = "Failed to Delete Comment";
+                try {
+                    const data = await response.json();
+                    errorMessage = data.error ?? errorMessage;
+                } catch {
+                    console.error("Could not read error message");
+                    console.log(response);
+                }
+                setErrorMessage(errorMessage);
+                return;
+            }
+            setComments((prev) => prev.filter((comment) => comment.id !== commentId));
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
 
     return (
         <div>
@@ -160,15 +186,15 @@ export default function PostDetails() {
             <button type="button" onClick={() => togglePostPublishStatus(post.id, post.isPublished)}>{post.isPublished ? "Unpublish post" : "Publish post"}</button>
             <Link to={`/admin/posts/${post.id}/edit`}>Edit post</Link>
             <button type="button" onClick={() => deletePost(post.id)}>Delete post</button>
+            <p>Nr of comments: {comments.length}</p>
 
-
-            <p>NrOfCommentsIconPlaceholder: {post._count.comments}</p>
             <p>Comments:</p>
             <ul>
                 {comments.map((comment) => (
                     <li key={comment.id}>
                         <div>{comment.body}</div>
-                        <div>{comment.author.username} - {comment.updatedAt ?? comment.publishedDate}</div>
+                        <div>{comment.author?.username ?? "deleted user"} - {comment.updatedAt ?? comment.publishedDate}</div>
+                        <button type="button" onClick={() => deleteComment(post.id, comment.id)}>Delete Comment</button>
                     </li>
                 ))}
             </ul>
