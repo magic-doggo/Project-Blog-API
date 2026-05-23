@@ -8,7 +8,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function PostDetails() {
     // const navigate = useNavigate();
-    const { token } = useAuth();
+    const { token, user } = useAuth();
     const { postId } = useParams();
     const id = Number(postId);
     const idIsValid = Number.isFinite(id) && id > 0;
@@ -115,6 +115,30 @@ export default function PostDetails() {
         }
     }
 
+    async function deleteComment(postId, commentId) {
+        try {
+            const response = await secureFetch(`${API_BASE_URL}/posts/${postId}/comments/${commentId}`, {
+                method: "DELETE",
+            });
+
+            if (!response.ok) {
+                let errorMessage = "Failed to Delete Comment";
+                try {
+                    const data = await response.json();
+                    errorMessage = data.error ?? errorMessage;
+                } catch {
+                    console.error("Could not read error message");
+                    console.log(response);
+                }
+                setErrorMessage(errorMessage);
+                return;
+            }
+            setComments((prev) => prev.filter((comment) => comment.id !== commentId));
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
     if (!idIsValid) {
         return <div>Please input a valid id</div>;
     }
@@ -152,7 +176,8 @@ export default function PostDetails() {
                         <button type="submit">Submit comment</button>
                     </form>
                 </div>) :
-                (<div>To leave a comment, please <Link to="/login" state={{ from: location }}>log in</Link>.</div>)}
+                (<div>To leave a comment, please <Link to="/login" state={{ from: location }}>log in</Link>.</div>)
+            }
             <p>Nr of comments: {comments.length}</p>
             <p>Comments:</p>
             <ul>
@@ -160,6 +185,12 @@ export default function PostDetails() {
                     <li key={comment.id}>
                         <div>{comment.body}</div>
                         <div>{comment.author?.username ?? "deleted user"} - {comment.updatedAt ?? comment.publishedDate}</div>
+                        { user && (user?.id === comment.author?.id || user?.role === "ADMIN") && (
+                            <button type="button" onClick={() => deleteComment(post.id, comment.id)}>
+                                Delete comment
+                            </button>
+                        )}
+
                     </li>
                 ))}
             </ul>
