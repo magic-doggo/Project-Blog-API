@@ -19,6 +19,8 @@ export default function PostDetails() {
     const [comments, setComments] = useState([]);
     const [commentBody, setCommentBody] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [editingCommentId, setEditingCommentId] = useState(null);
+    const [editCommentBody, setEditCommentBody] = useState("");
     const secureFetch = useSecureFetch();
 
     const loadComments = useCallback(async () => {
@@ -33,10 +35,8 @@ export default function PostDetails() {
                 throw new Error("Failed to fetch comments");
             };
             const data = await response.json();
-            console.log("data.comments: ", data.comments);
             // if (cancelled) return;
             setComments(data.comments ?? []);
-            console.log("data: ", data)
         } catch (err) {
             console.error(err);
         }
@@ -57,10 +57,8 @@ export default function PostDetails() {
                     throw new Error("Failed to fetch post");
                 };
                 const data = await response.json();
-                console.log(data.post);
                 if (cancelled) return;
                 setPost(data.post ?? null);
-                console.log("data: ", data)
             } catch (err) {
                 console.error(err);
             }
@@ -98,11 +96,10 @@ export default function PostDetails() {
             } catch {
                 data = null;
             }
-            console.log("data: ", data)
 
             if (!response.ok) {
                 console.log("error: ", data.error)
-                setErrorMessage(data?.error ?? `failed to create post (${response.status})`);
+                setErrorMessage(data?.error ?? `failed to create comment (${response.status})`);
                 return;
             }
 
@@ -136,6 +133,47 @@ export default function PostDetails() {
             setComments((prev) => prev.filter((comment) => comment.id !== commentId));
         } catch (err) {
             console.error(err)
+        }
+    }
+
+    async function submitEdit(commentId) {
+        // setErrorMessage("");
+        //maybe some frontend validation
+        const trimmed = editCommentBody.trim();
+        if (!trimmed) {
+            setErrorMessage("Edited comment cannot be empty.");
+            return;
+        }
+        try {
+            const response = await secureFetch(`${API_BASE_URL}/posts/${id}/comments/${commentId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ commentBody: trimmed }),
+            });
+
+
+            let data = null;
+            try {
+                data = await response.json();
+            } catch {
+                data = null;
+            }
+
+            if (!response.ok) {
+                console.log("error: ", data.error)
+                setErrorMessage(data?.error ?? `failed to edit comment (${response.status})`);
+                return;
+            }
+
+            setEditingCommentId(null);
+            setEditCommentBody("");
+            setErrorMessage("");
+            await loadComments();
+        } catch (err) {
+            console.error(err);
+            setErrorMessage("Could not reach the server");
         }
     }
 
@@ -183,14 +221,49 @@ export default function PostDetails() {
             <ul>
                 {comments.map((comment) => (
                     <li key={comment.id}>
-                        <div>{comment.body}</div>
-                        <div>{comment.author?.username ?? "deleted user"} - {comment.updatedAt ?? comment.publishedDate}</div>
-                        { user && (user?.id === comment.author?.id || user?.role === "ADMIN") && (
-                            <button type="button" onClick={() => deleteComment(post.id, comment.id)}>
-                                Delete comment
-                            </button>
+                        {editingCommentId === comment.id ? (
+                            <form onSubmit={(e) => {
+                                e.preventDefault();
+                                submitEdit(comment.id);
+                            }}>
+                                <input
+                                    type="text"
+                                    value={editCommentBody}
+                                    onChange={(e) => setEditCommentBody(e.target.value)}
+                                    autoFocus
+                                />
+                                <button type="submit">Save</button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setEditingCommentId(null);
+                                        setEditCommentBody("");
+                                        setErrorMessage("");
+                                    }}>
+                                    Cancel
+                                </button>
+                            </form>
+                        ) : (
+                            <>
+                                <div>{comment.body}</div>
+                                <div>{comment.author?.username ?? "deleted user"} - {comment.updatedAt ?? comment.publishedDate}</div>
+                                {user && (user?.id === comment.authorId) && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setEditingCommentId(comment.id);
+                                            setEditCommentBody(comment.body);
+                                        }}>
+                                        Edit
+                                    </button>
+                                )}
+                                {user && (user?.id === comment.authorId || user?.role === "ADMIN") && (
+                                    <button type="button" onClick={() => deleteComment(post.id, comment.id)}>
+                                        Delete
+                                    </button>
+                                )}
+                            </>
                         )}
-
                     </li>
                 ))}
             </ul>
