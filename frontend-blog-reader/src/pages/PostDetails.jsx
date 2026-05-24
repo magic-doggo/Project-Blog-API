@@ -214,7 +214,7 @@ export default function PostDetails() {
                         <button type="submit">Submit comment</button>
                     </form>
                 </div>) :
-                (<div>To leave a comment, please <Link to="/login" state={{ from: location }}>log in</Link>.</div>)
+                (<div>To leave a comment, please <Link to="/login" state={{ from: location.pathname + location.search }}>log in</Link>.</div>)
             }
             <p>Nr of comments: {comments.length}</p>
             <p>Comments:</p>

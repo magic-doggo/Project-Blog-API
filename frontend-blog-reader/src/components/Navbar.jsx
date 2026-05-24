@@ -9,7 +9,7 @@ export default function Navbar() {
         <nav className="navbar">
             <h2>Blog admin</h2>
             <ul>
-                <li><NavLink to="/" className={({ isActive }) => isActive ? styles.active : ""} >Home Page</NavLink></li> 
+                <li><NavLink to="/" className={({ isActive }) => isActive ? styles.active : ""} >Home Page</NavLink></li>
                 {user ?
                     (
                         <>
@@ -19,9 +19,10 @@ export default function Navbar() {
                         </>
 
                     ) : (
-                        <li>
-                            <NavLink to="/login" className={({ isActive }) => (isActive ? styles.active : "")}>Login</NavLink>
-                        </li>
+                        <>
+                            <li><NavLink to="/login" className={({ isActive }) => (isActive ? styles.active : "")}>Login</NavLink></li>
+                            <li><NavLink to="/register" className={({ isActive }) => (isActive ? styles.active : "")}>Register</NavLink></li>
+                        </>
                     )
                 }
             </ul>

@@ -2,18 +2,16 @@ import { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom"
 import { useAuth } from "../context/AuthContext";
 import { toast } from "sonner";
-// import { useEffect } from "react";
 
-export default function Login() {
+export default function Register() {
     const navigate = useNavigate();
     const location = useLocation();
     const { login } = useAuth();
     const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-    // const fromPath = location.state?.from?.pathname || "/";
     const fromPath = location.state?.from ?? "/";
-    console.log(location.state);
     // useEffect(() => {
     //     console.log("location.state:", location.state);
     // }, [location]);
@@ -23,13 +21,14 @@ export default function Login() {
         const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
         //maybe some frontend validation
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            const response = await fetch(`${API_BASE_URL}/auth/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                     email,
+                    username,
                     password,
                 }),
 
@@ -43,17 +42,13 @@ export default function Login() {
                 data = null;
             }
 
-            // console.log("data: ", data) // token + user.id,username,email,role
             if (!response.ok) {
                 console.log("error: ", data.error)
-                setErrorMessage(data.error ?? "test error logging in");
+                setErrorMessage(data.error ?? "test error registering");
                 return;
             }
             login(data.token, data.user);
-            toast.success("Logged in successfully");
-            // navigate("/", {
-            //     state: { message: "Log in successful" },
-            // });
+            toast.success("Registered successfully");
             navigate(fromPath,
                 {
                     replace: true,
@@ -65,8 +60,8 @@ export default function Login() {
     }
     return (
         <div>
-            <h1>User Login</h1>
-            <p>Login form:</p>
+            <h1>User Register</h1>
+            <p>Register form:</p>
             <form onSubmit={handleSubmit} >
                 <label htmlFor="email">Email: </label>
                 <input
@@ -76,6 +71,16 @@ export default function Login() {
                     value={email}
                     onChange={(e) => {
                         setEmail(e.target.value); setErrorMessage("");
+                    }} required
+                />
+                <label htmlFor="username">Username: </label>
+                <input
+                    id="username"
+                    type="text"
+                    name="username"
+                    value={username}
+                    onChange={(e) => {
+                        setUsername(e.target.value); setErrorMessage("");
                     }} required
                 />
 
@@ -90,10 +95,10 @@ export default function Login() {
                     }} required
                 />
                 {errorMessage && <p role="alert">{errorMessage}</p>}
-                <button type="submit">Log in</button>
+                <button type="submit">Register</button>
             </form>
 
-            <p>Do not have an account? <Link to="/register" state={{ from: fromPath }}>Register here</Link>.</p>
+            <p>Already have an account? <Link to="/login">Log in</Link></p>
         </div>
     )
 }

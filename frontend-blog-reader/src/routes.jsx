@@ -3,6 +3,7 @@ import App from "./App";
 import Home from "./pages/Home";
 import PostDetails from "./pages/PostDetails";
 import Login from "./pages/Login";
+import Register from "./pages/Register"
 // import ErrorPage from "./pages/ErrorPage";
 
 const routes = [
@@ -22,6 +23,10 @@ const routes = [
             {
                 path: "login",
                 element: <Login />
+            },
+            {
+                path: "register",
+                element: <Register />
             }
             // {
             //     element: <ProtectedRoute />,
