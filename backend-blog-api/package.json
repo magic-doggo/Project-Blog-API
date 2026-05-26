@@ -12,5 +12,10 @@
   },
   "devDependencies": {
     "prisma": "^7.6.0"
-  }
+  },
+  "scripts": {
+  "start": "node app.js",
+  "dev": "nodemon app.js",
+  "postinstall": "npx prisma generate" 
+}
 }
