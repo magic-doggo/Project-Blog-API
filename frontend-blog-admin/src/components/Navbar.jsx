@@ -1,6 +1,7 @@
 import { useAuth } from "../context/AuthContext";
 import { NavLink } from "react-router-dom";
 import styles from "./Navbar.module.css"
+import ReaderSwapButton from "./ReaderSwapButton";
 
 export default function Navbar() {
     const { user, logout } = useAuth();
@@ -17,6 +18,7 @@ export default function Navbar() {
                             <li><span className="welcome-text">Hi, {user.username}</span></li>
                             <li><NavLink to="/admin/newPost" className={({ isActive }) => (isActive ? styles.active : "")}>Create new Post +</NavLink></li>
                             <li><button onClick={logout} className="logout-btn">Logout</button></li>
+                            <ReaderSwapButton/>
                         </>
 
                     ) : (
