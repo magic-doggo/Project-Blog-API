@@ -61,6 +61,7 @@ export default function PostDetails() {
                 setPost(data.post ?? null);
             } catch (err) {
                 console.error(err);
+                if (!cancelled) console.log("asdasdasd")
             }
         }
         loadPost();

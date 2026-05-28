@@ -13,7 +13,6 @@ export default function Login() {
     const [errorMessage, setErrorMessage] = useState("");
     // const fromPath = location.state?.from?.pathname || "/";
     const fromPath = location.state?.from ?? "/";
-    console.log(location.state);
     // useEffect(() => {
     //     console.log("location.state:", location.state);
     // }, [location]);

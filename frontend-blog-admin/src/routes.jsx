@@ -5,13 +5,13 @@ import Login from "./pages/Login";
 import NewPost from "./pages/NewPost"
 import PostDetails from "./pages/PostDetails";
 import EditPost from "./pages/EditPost"
-// import ErrorPage from "./pages/ErrorPage";
+import ErrorPage from "./components/ErrorPage";
 
 const routes = [
     {
         path: "/admin",
         element: <App />,
-        //errorElement: <ErrorPage />,
+        errorElement: <ErrorPage />,
         children: [
             {
                 element: <ProtectedRoute />,

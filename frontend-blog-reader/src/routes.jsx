@@ -4,13 +4,13 @@ import Home from "./pages/Home";
 import PostDetails from "./pages/PostDetails";
 import Login from "./pages/Login";
 import Register from "./pages/Register"
-// import ErrorPage from "./pages/ErrorPage";
+import ErrorPage from "./components/ErrorPage";
 
 const routes = [
     {
         path: "/",
         element: <App />,
-        //errorElement: <ErrorPage />,
+        errorElement: <ErrorPage />,
         children: [
             {
                 path: "/",
