@@ -3,7 +3,6 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { useSecureFetch } from "../hooks/useSecureFetch";
 import DOMPurify from 'dompurify';
-import EditPost from "./EditPost";
 
 
 
@@ -20,6 +19,7 @@ export default function PostDetails() {
     const [post, setPost] = useState(null);
     const [comments, setComments] = useState([]);
     const [errorMessage, setErrorMessage] = useState("");
+    const [postStatus, setPostStatus] = useState("loading"); // "loading", "ready", "not-found", "error"
 
     const secureFetch = useSecureFetch();
 
@@ -27,6 +27,8 @@ export default function PostDetails() {
         if (!idIsValid) return;
         let cancelled = false;
         async function loadPost() {
+            setPostStatus("loading");
+            setPost(null);
             try {
                 const response = await secureFetch(`${API_BASE_URL}/admin/posts/${id}`, {
                     method: "GET",
@@ -34,16 +36,30 @@ export default function PostDetails() {
                         "Content-Type": "application/json",
                     }
                 });
+
+                if (response.status === 404) {
+                    if (!cancelled) setPostStatus("not-found");
+                    return;
+                }
                 if (!response.ok) {
-                    throw new Error("Failed to fetch post");
-                };
+                    if (!cancelled) setPostStatus("error");
+                    return;
+                }
                 const data = await response.json();
-                console.log(data.post);
                 if (cancelled) return;
-                setPost(data.post ?? null);
-                console.log("data: ", data)
+
+                if (!data.post) {
+                    if (!cancelled) setPostStatus("not-found");
+                    return;
+                }
+                if (!cancelled) {
+                    setPost(data.post);
+                    setPostStatus("ready");
+                }
+
             } catch (err) {
                 console.error(err);
+                if (!cancelled) setPostStatus("error");
             }
         }
         loadPost();
@@ -78,9 +94,26 @@ export default function PostDetails() {
     if (!idIsValid) {
         return <div>Please input a valid id</div>;
     }
-    if (!post) return <p>Loading…</p>;
-    if (!comments) return <p>Loading…</p>;
 
+    if (postStatus === "loading") {
+        return <p>Loading…</p>;
+    }
+    if (postStatus === "not-found") {
+        return (
+            <div>
+                <p role="alert">Post not found.</p>
+                <Link to="/admin">Back to home</Link>
+            </div>
+        );
+    }
+    if (postStatus === "error") {
+        return (
+            <div>
+                <p role="alert">Could not load this post.</p>
+                <Link to="/admin">Back to home</Link>
+            </div>
+        );
+    }
 
     async function togglePostPublishStatus(targetId, currentlyPublished) {
         if (!token) return;

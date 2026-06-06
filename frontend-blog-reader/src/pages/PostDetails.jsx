@@ -21,6 +21,8 @@ export default function PostDetails() {
     const [errorMessage, setErrorMessage] = useState("");
     const [editingCommentId, setEditingCommentId] = useState(null);
     const [editCommentBody, setEditCommentBody] = useState("");
+    const [postStatus, setPostStatus] = useState("loading"); // "loading", "ready", "not-found", "error"
+
     const secureFetch = useSecureFetch();
 
     const loadComments = useCallback(async () => {
@@ -46,6 +48,8 @@ export default function PostDetails() {
         if (!idIsValid) return;
         let cancelled = false;
         async function loadPost() {
+            setPostStatus("loading");
+            setPost(null);
             try {
                 const response = await fetch(`${API_BASE_URL}/posts/${id}`, {
                     method: "GET",
@@ -53,15 +57,31 @@ export default function PostDetails() {
                         "Content-Type": "application/json",
                     }
                 });
+
+                if (response.status === 404) {
+                    if (!cancelled) setPostStatus("not-found");
+                    return;
+                }
                 if (!response.ok) {
-                    throw new Error("Failed to fetch post");
-                };
+                    if (!cancelled) setPostStatus("error");
+                    return;
+                }
                 const data = await response.json();
                 if (cancelled) return;
-                setPost(data.post ?? null);
+
+
+                if (!data.post) {
+                    if (!cancelled) setPostStatus("not-found");
+                    return;
+                }
+                if (!cancelled) {
+                    setPost(data.post);
+                    setPostStatus("ready");
+                }
+
             } catch (err) {
                 console.error(err);
-                if (!cancelled) console.log("asdasdasd")
+                if (!cancelled) setPostStatus("error");
             }
         }
         loadPost();
@@ -181,8 +201,25 @@ export default function PostDetails() {
     if (!idIsValid) {
         return <div>Please input a valid id</div>;
     }
-    if (!post) return <p>Loading…</p>;
-
+    if (postStatus === "loading") {
+        return <p>Loading…</p>;
+    }
+    if (postStatus === "not-found") {
+        return (
+            <div>
+                <p role="alert">Post not found.</p>
+                <Link to="/">Back to home</Link>
+            </div>
+        );
+    }
+    if (postStatus === "error") {
+        return (
+            <div>
+                <p role="alert">Could not load this post.</p>
+                <Link to="/">Back to home</Link>
+            </div>
+        );
+    }
     return (
         <div>
             <h2>Post Details:</h2>

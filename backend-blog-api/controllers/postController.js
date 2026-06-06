@@ -74,6 +74,9 @@ async function getPostWithAuthor(req, res) {
                 }
             }
         })
+        if (!postWithAuthor) {
+            return res.status(404).json({ error: "Post not found" });
+        }
         res.json({ post: postWithAuthor });
     } catch (err) {
         console.error(err);
@@ -101,6 +104,9 @@ async function getPublishedPostWithAuthor(req, res) {
                 }
             }
         })
+        if (!publishedPostWithAuthor) {
+            return res.status(404).json({ error: "Post not found" });
+        }
         res.json({ post: publishedPostWithAuthor });
     } catch (err) {
         console.error(err);
