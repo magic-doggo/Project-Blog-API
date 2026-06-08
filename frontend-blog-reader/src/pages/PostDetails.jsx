@@ -257,53 +257,56 @@ export default function PostDetails() {
             <p>Nr of comments: {comments.length}</p>
             <p>Comments:</p>
             <ul>
-                {comments.map((comment) => (
-                    <li key={comment.id}>
-                        {editingCommentId === comment.id ? (
-                            <form onSubmit={(e) => {
-                                e.preventDefault();
-                                submitEdit(comment.id);
-                            }}>
-                                <input
-                                    type="text"
-                                    value={editCommentBody}
-                                    onChange={(e) => setEditCommentBody(e.target.value)}
-                                    autoFocus
-                                />
-                                <button type="submit">Save</button>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setEditingCommentId(null);
-                                        setEditCommentBody("");
-                                        setErrorMessage("");
-                                    }}>
-                                    Cancel
-                                </button>
-                            </form>
-                        ) : (
-                            <>
-                                <div>{comment.body}</div>
-                                <div>{comment.author?.username ?? "deleted user"} - {comment.updatedAt ?? comment.publishedDate}</div>
-                                {user && (user?.id === comment.authorId) && (
+                {comments.map((comment) => {
+                    const isEdited = comment.updatedAt !== comment.publishedDate;
+                    return (
+                        <li key={comment.id}>
+                            {editingCommentId === comment.id ? (
+                                <form onSubmit={(e) => {
+                                    e.preventDefault();
+                                    submitEdit(comment.id);
+                                }}>
+                                    <input
+                                        type="text"
+                                        value={editCommentBody}
+                                        onChange={(e) => setEditCommentBody(e.target.value)}
+                                        autoFocus
+                                    />
+                                    <button type="submit">Save</button>
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            setEditingCommentId(comment.id);
-                                            setEditCommentBody(comment.body);
+                                            setEditingCommentId(null);
+                                            setEditCommentBody("");
+                                            setErrorMessage("");
                                         }}>
-                                        Edit
+                                        Cancel
                                     </button>
-                                )}
-                                {user && (user?.id === comment.authorId || user?.role === "ADMIN") && (
-                                    <button type="button" onClick={() => deleteComment(post.id, comment.id)}>
-                                        Delete
-                                    </button>
-                                )}
-                            </>
-                        )}
-                    </li>
-                ))}
+                                </form>
+                            ) : (
+                                <>
+                                    <div>{comment.body}</div>
+                                    <div>{comment.author?.username ?? "deleted user"} - {isEdited ? `edited at: ${comment.updatedAt}` : `posted at: ${comment.publishedDate}`}</div>
+                                    {user && (user?.id === comment.authorId) && (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setEditingCommentId(comment.id);
+                                                setEditCommentBody(comment.body);
+                                            }}>
+                                            Edit
+                                        </button>
+                                    )};
+                                    {user && (user?.id === comment.authorId || user?.role === "ADMIN") && (
+                                        <button type="button" onClick={() => deleteComment(post.id, comment.id)}>
+                                            Delete
+                                        </button>
+                                    )}
+                                </>
+                            )}
+                        </li>
+                    )
+                })}
             </ul>
 
         </div>

@@ -223,13 +223,16 @@ export default function PostDetails() {
 
             <p>Comments:</p>
             <ul>
-                {comments.map((comment) => (
-                    <li key={comment.id}>
-                        <div>{comment.body}</div>
-                        <div>{comment.author?.username ?? "deleted user"} - {comment.updatedAt ?? comment.publishedDate}</div>
-                        <button type="button" onClick={() => deleteComment(post.id, comment.id)}>Delete Comment</button>
-                    </li>
-                ))}
+                {comments.map((comment) => {
+                    const isEdited = comment.updatedAt !== comment.publishedDate;
+                    return (
+                        <li key={comment.id}>
+                            <div>{comment.body}</div>
+                            <div>{comment.author?.username ?? "deleted user"} - {isEdited ? `edited at: ${comment.updatedAt}` : `posted at: ${comment.publishedDate}`}</div>
+                            <button type="button" onClick={() => deleteComment(post.id, comment.id)}>Delete Comment</button>
+                        </li>
+                    )
+                })}
             </ul>
         </div>
     )
