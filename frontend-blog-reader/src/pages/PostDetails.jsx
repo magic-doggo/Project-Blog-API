@@ -296,7 +296,7 @@ export default function PostDetails() {
                                             }}>
                                             Edit
                                         </button>
-                                    )};
+                                    )}
                                     {user && (user?.id === comment.authorId || user?.role === "ADMIN") && (
                                         <button type="button" onClick={() => deleteComment(post.id, comment.id)}>
                                             Delete

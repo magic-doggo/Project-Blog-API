@@ -30,7 +30,6 @@ export default function Dashboard() {
         const data = await response.json();
         if (cancelled) return;
         setPosts(data.posts ?? []);
-        console.log("data: ", data)
       } catch (err) {
         console.error(err);
       }

@@ -162,7 +162,6 @@ async function createNewPost(req, res) {
                 authorId: authorId
             }
         })
-        console.log(newPost, "test");
         res.json({ post: newPost });
     } catch (err) {
         console.error(err);
@@ -248,7 +247,6 @@ async function updatePostStatus(req, res) {
                 publishedDate: isPublished ? new Date() : null
             }
         });
-        console.log(updatedPostStatus, " updatedpoststatus")
         res.json(updatedPostStatus);
     } catch (err) {
         console.error(err);

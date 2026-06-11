@@ -45,11 +45,9 @@ export default function EditPost() {
                     throw new Error("Failed to fetch post");
                 };
                 const data = await response.json();
-                console.log(data.post);
                 if (cancelled) return;
                 setTitle(data.post.title ?? "");
                 setPostBody(data.post.body ?? "");
-                console.log("data: ", data)
             } catch (err) {
                 console.error(err);
             } finally {
@@ -93,8 +91,6 @@ export default function EditPost() {
             } catch {
                 data = null;
             }
-            console.log("data: ", data)
-
             if (!response.ok) {
                 console.log("error: ", data.error)
                 setErrorMessage(data?.error ?? `failed to create post (${response.status})`);

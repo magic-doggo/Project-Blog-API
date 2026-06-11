@@ -7,9 +7,7 @@ export default function ReaderSwapButton() {
     if (nonAdminPath.includes("newPost")) {
         nonAdminPath = "/"
     } else if (nonAdminPath.includes("edit")) {
-        console.log("edit path before", nonAdminPath);
         nonAdminPath = nonAdminPath.replace("/edit", "");
-        console.log("edit path after", nonAdminPath)
 
     }
     const targetURL = `${readerBaseUrl}${nonAdminPath}`;

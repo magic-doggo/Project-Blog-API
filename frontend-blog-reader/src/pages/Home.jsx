@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { useSecureFetch } from "../hooks/useSecureFetch";
+// import { useAuth } from "../context/AuthContext";
+// import { useSecureFetch } from "../hooks/useSecureFetch";
 import { Link } from "react-router-dom";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Dashboard() {
-  const secureFetch = useSecureFetch(); //logs out user if they use expired token for api calls
-  const { token } = useAuth();
+  // const secureFetch = useSecureFetch(); //logs out user if they use expired token for api calls
+  // const { token } = useAuth();
   const [posts, setPosts] = useState([]);
-  const [errorMessage, setErrorMessage] = useState("");
 
 
   useEffect(() => {
@@ -28,7 +27,6 @@ export default function Dashboard() {
         const data = await response.json();
         if (cancelled) return;
         setPosts(data.posts ?? []);
-        console.log("data: ", data)
       } catch (err) {
         console.error(err);
       }
@@ -47,7 +45,6 @@ export default function Dashboard() {
         <p>No posts yet</p>
       ) : (
         <div>
-          {errorMessage && <p role="alert">{errorMessage}</p>}
           <ul>
             {posts.map((post) => (
               <li key={post.id}>

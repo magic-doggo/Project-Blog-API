@@ -76,10 +76,8 @@ export default function PostDetails() {
                     throw new Error("Failed to fetch comments");
                 };
                 const data = await response.json();
-                console.log("data.comments: ", data.comments);
                 if (cancelled) return;
                 setComments(data.comments ?? null);
-                console.log("data: ", data)
             } catch (err) {
                 console.error(err);
             }

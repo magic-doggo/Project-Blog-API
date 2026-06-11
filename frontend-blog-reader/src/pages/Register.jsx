@@ -33,8 +33,6 @@ export default function Register() {
                 }),
 
             })
-            // console.log("response:", response); //status, type: cors, url
-
             let data = null;
             try {
                 data = await response.json();

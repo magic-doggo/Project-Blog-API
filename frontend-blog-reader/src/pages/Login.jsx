@@ -33,16 +33,12 @@ export default function Login() {
                 }),
 
             })
-            // console.log("response:", response); //status, type: cors, url
-
             let data = null;
             try {
                 data = await response.json();
             } catch {
                 data = null;
             }
-
-            // console.log("data: ", data) // token + user.id,username,email,role
             if (!response.ok) {
                 console.log("error: ", data.error)
                 setErrorMessage(data.error ?? "test error logging in");

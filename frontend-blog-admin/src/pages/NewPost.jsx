@@ -51,8 +51,6 @@ export default function NewPost() {
             } catch {
                 data = null;
             }
-            console.log("data: ", data)
-
             if (!response.ok) {
                 console.log("error: ", data.error)
                 setErrorMessage(data?.error ?? `failed to create post (${response.status})`);
