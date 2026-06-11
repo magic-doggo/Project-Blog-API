@@ -1,8 +1,16 @@
 const express = require("express");
 const app = express();
-var cors = require('cors');
-app.use(cors());
-
+const cors = require('cors');
+const allowedOrigins = [
+  "http://localhost:5173", //reader app
+  "http://localhost:5174", //admin app
+  "https://blog-api-frontend-reader.vercel.app", //reader app
+  "https://blog-api-frontend-admin.vercel.app" //admin app
+];
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 app.use(express.json());
 const adminPostRouter = require("./routes/adminPostRouter");
 const publicPostRouter = require("./routes/publicPostRouter");
